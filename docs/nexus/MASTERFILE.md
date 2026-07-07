@@ -127,7 +127,7 @@ Output:
 
 ## Implementation status (v0.1, first build)
 
-Implemented under [`artifacts/nexus`](../../artifacts/nexus):
+Implemented under [`apps/nexus`](../../apps/nexus) (path updated post-move; see docs/MASTERFILE.md):
 
 - Hybrid MCP (stdio) + HTTP (`:3456`) server in one process, per §3.
 - Markdown + frontmatter storage for notes, facts, decisions, assets.
@@ -147,5 +147,5 @@ Not yet implemented (deliberately out of scope for v0.1):
   future direction, no code against it yet.
 - Cross-app intelligence layer beyond the shared HTTP API.
 
-See [`artifacts/nexus/README.md`](../../artifacts/nexus/README.md) for setup,
+See [`apps/nexus/README.md`](../../apps/nexus/README.md) for setup,
 environment variables, and the full tool/route list.

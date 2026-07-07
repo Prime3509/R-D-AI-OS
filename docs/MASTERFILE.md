@@ -8,7 +8,7 @@
 This is the current single source of truth for both **R&D Forge** and **R&D Nexus**.
 It supersedes [`docs/nexus/MASTERFILE.md`](nexus/MASTERFILE.md) (v1.1, Nexus-only),
 which is kept for historical reference on the decisions made while building the
-Nexus v0.1 implementation in [`artifacts/nexus`](../artifacts/nexus).
+Nexus v0.1 implementation in [`apps/nexus`](../apps/nexus).
 
 ---
 
@@ -216,7 +216,7 @@ Intent → Semantic Search → Knowledge Graph → Ranking → Confidence → Re
   - Semantic result caching (with cosine similarity threshold)
   - Real embeddings via `@huggingface/transformers` (the maintained successor
     to `@xenova/transformers`; same `pipeline("feature-extraction", ...)` API —
-    see [`artifacts/nexus/README.md`](../artifacts/nexus/README.md) for why)
+    see [`apps/nexus/README.md`](../apps/nexus/README.md) for why)
   - Smart Index Selector (HNSW / IVF-PQ)
   - Auto re-indexing + scheduled re-indexing
   - Health checks and pre-warm utilities
@@ -246,8 +246,7 @@ Intent → Semantic Search → Knowledge Graph → Ranking → Confidence → Re
 ## 9. Current Implementation Status
 
 ### R&D Nexus (MCP Server)
-Implemented under [`artifacts/nexus`](../artifacts/nexus) (v0.1, not yet moved to
-the `apps/nexus` path this masterfile specifies — see the note below):
+Implemented under [`apps/nexus`](../apps/nexus) (v0.1):
 - Hybrid MCP + HTTP architecture, in one process
 - Full 10-tool set implemented (list/read/write notes, save/recall facts,
   log/get decisions, save/get assets, teaching feedback), mirrored as HTTP routes
@@ -266,14 +265,16 @@ session management — is a substantial, separate effort from what's been built
 so far and hasn't been scoped or confirmed.
 
 ### Repository structure gap
-This masterfile's §3 structure (`apps/forge`, `apps/nexus`, `packages/sdk`,
-`packages/engine`, `packages/core`) is the target layout. The repo currently
-has `artifacts/nexus` (per the pre-existing `docs/ARCHITECTURE.md` convention)
-and no `packages/*` or `apps/forge` yet. Moving `artifacts/nexus` →
-`apps/nexus` and extracting a `packages/sdk` are structural changes with real
-blast radius (mid-review on an open PR, no consumers of a shared SDK exist
-yet to justify extraction) and haven't been executed pending confirmation of
-scope and sequencing.
+This masterfile's §3 layout is now in place: [`apps/nexus`](../apps/nexus)
+holds the Nexus implementation, and [`packages/sdk`](../packages/sdk),
+[`packages/engine`](../packages/engine), and [`packages/core`](../packages/core)
+exist as placeholder workspace packages (each documenting its intended
+responsibility) reserving their slots in the layout. None of the three
+`packages/*` placeholders have real code yet — deliberately: with only one
+consumer (Nexus) and no R&D Forge yet, there's nothing to extract shared
+logic *from* a second app, so populating them now would mean writing
+speculative code with no real caller. `apps/forge` doesn't exist yet either —
+see below.
 
 ---
 

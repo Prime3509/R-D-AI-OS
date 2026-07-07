@@ -5,8 +5,9 @@ hybrid **MCP (stdio) + HTTP** server: the same domain logic is exposed as MCP
 tools for AI clients (Claude, Cursor, etc.) and as a REST API for other apps
 (e.g. R&D Forge).
 
-See [`docs/nexus/MASTERFILE.md`](../../docs/nexus/MASTERFILE.md) for the full spec this
-package implements against.
+See [`docs/MASTERFILE.md`](../../docs/MASTERFILE.md) for the full spec this
+package implements against (the Nexus-only [v1.1 doc](../../docs/nexus/MASTERFILE.md)
+is kept for historical reference).
 
 ## Storage model
 
@@ -19,7 +20,7 @@ package implements against.
 ## Quick start
 
 ```bash
-cd artifacts/nexus
+cd apps/nexus
 pnpm install
 pnpm run build
 
@@ -52,7 +53,7 @@ embedding runs fully offline.
   "mcpServers": {
     "rd-nexus": {
       "command": "node",
-      "args": ["/absolute/path/to/artifacts/nexus/dist/index.js", "--mode=mcp"]
+      "args": ["/absolute/path/to/apps/nexus/dist/index.js", "--mode=mcp"]
     }
   }
 }

@@ -8,5 +8,5 @@ build/
 .DS_Store
 
 # Nexus runtime storage (markdown memory + LanceDB tables + cached embedding models)
-artifacts/nexus/data/
-artifacts/nexus/.cache/
+apps/nexus/data/
+apps/nexus/.cache/

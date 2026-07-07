@@ -11,7 +11,7 @@
   | Project | Description | Status |
   |---------|-------------|--------|
   | R-D-AI-OS | Parent platform & shared infrastructure | 🟢 Active |
-  | [R&D Nexus](artifacts/nexus) | Shared memory & knowledge OS — hybrid MCP + HTTP server | 🟡 In Development |
+  | [R&D Nexus](apps/nexus) | Shared memory & knowledge OS — hybrid MCP + HTTP server | 🟡 In Development |
 
   ## Quick Start
 

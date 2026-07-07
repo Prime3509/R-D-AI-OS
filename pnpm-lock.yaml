@@ -8,7 +8,7 @@ importers:
 
   .: {}
 
-  artifacts/nexus:
+  apps/nexus:
     dependencies:
       '@huggingface/transformers':
         specifier: ^4.0.0
@@ -47,6 +47,12 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@22.20.0)(tsx@4.23.0)
+
+  packages/core: {}
+
+  packages/engine: {}
+
+  packages/sdk: {}
 
 packages:
 
