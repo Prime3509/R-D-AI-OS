@@ -7,6 +7,10 @@
 
 This file contains **only Nexus-related** content. It is kept clean and straightforward for efficient use with Claude Code.
 
+> **Superseded by [`docs/MASTERFILE.md`](../MASTERFILE.md) (v2.4)**, which
+> covers both R&D Forge and R&D Nexus. This file is kept for historical
+> reference on the decisions made while building Nexus v0.1.
+
 ---
 
 ## 1. Purpose of R&D Nexus
