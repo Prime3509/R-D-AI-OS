@@ -35,14 +35,17 @@
   ## Key Decisions
 
   - **Contract-first API** — OpenAPI spec defines the contract; code generated from it
-  - **Monorepo** — sub-systems share types, schemas, and utilities via `lib/*` packages
+  - **Monorepo** — apps live under `apps/*`, sub-systems share types, schemas, and utilities via `packages/*`
   - **Zod validation** — all inputs/outputs validated at the boundary
   - **Integration-first** — third-party services via Replit Connectors (no raw API keys in code)
 
   ## Adding a New Sub-System
 
-  1. Create a new package under `artifacts/` or `lib/`
+  1. Create a new package under `apps/` (a runnable app/server) or `packages/` (shared library)
   2. Define its API contract in OpenAPI
   3. Run codegen: `pnpm --filter @workspace/api-spec run codegen`
   4. Wire into the shared router
+
+  See [`docs/MASTERFILE.md`](MASTERFILE.md) for the R&D Forge + R&D Nexus-specific
+  architecture, engineering rules, and current implementation status.
   

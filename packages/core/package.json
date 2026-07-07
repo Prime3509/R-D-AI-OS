@@ -1,0 +1,7 @@
+{
+  "name": "@rd/core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Foundational standards and configurations shared across R&D Collective apps and packages.",
+  "type": "module"
+}

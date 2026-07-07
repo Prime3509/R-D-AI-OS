@@ -11,6 +11,14 @@
   | Project | Description | Status |
   |---------|-------------|--------|
   | R-D-AI-OS | Parent platform & shared infrastructure | 🟢 Active |
+  | [R&D Nexus](apps/nexus) | Shared memory & knowledge OS — hybrid MCP + HTTP server | 🟡 In Development |
+  | R&D Forge | AI dev workspace (Expo/React Native) | 🔴 Not Started |
+  | FlowPay | Gig income tracking & wealth-building app | ⚪ External |
+  | GhostKey | Floating overlay automation layer for Android | ⚪ External |
+  | Sin Vergüenza | Streetwear line | ⚪ External |
+  | CreamPicks | Gamified investment/dividend-picks app | ⚪ External |
+
+  See [docs/BRAND.md](docs/BRAND.md) for the full company/brand identity and product roster.
 
   ## Quick Start
 
