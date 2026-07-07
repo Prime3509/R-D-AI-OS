@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Nexus runtime storage (markdown memory + LanceDB tables + cached embedding models)
+artifacts/nexus/data/
+artifacts/nexus/.cache/

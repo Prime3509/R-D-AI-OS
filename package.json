@@ -1,0 +1,15 @@
+{
+  "name": "r-d-ai-os",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Parent monorepo for Resist & Defy Collective — AI tooling, internal ops, creative systems.",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "nexus:build": "pnpm --filter @rd/nexus run build",
+    "nexus:dev": "pnpm --filter @rd/nexus run dev",
+    "nexus:test": "pnpm --filter @rd/nexus run test"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "@rd/nexus",
+  "version": "0.1.0",
+  "description": "R&D Nexus — shared memory and knowledge operating system for R&D Collective. Hybrid MCP + HTTP server.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "nexus": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && chmod +x dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "start:mcp": "node dist/index.js --mode=mcp",
+    "start:http": "node dist/index.js --mode=http",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.0.0",
+    "@lancedb/lancedb": "^0.31.0",
+    "@modelcontextprotocol/sdk": "^1.19.1",
+    "express": "^5.1.0",
+    "gray-matter": "^4.0.3",
+    "nanoid": "^5.1.5",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
