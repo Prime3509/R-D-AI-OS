@@ -15,7 +15,6 @@ let teaching: typeof import("../src/domain/teaching.js");
 beforeAll(async () => {
   const { setEmbedder } = await import("../src/core/embeddings.js");
   setEmbedder({
-    dimensions: 8,
     async embed(text: string) {
       const v = new Array(8).fill(0);
       for (let i = 0; i < text.length; i++) v[i % 8] += text.charCodeAt(i) / 255;
@@ -68,6 +67,31 @@ describe("facts + semantic recall", () => {
     expect(results).toHaveLength(1);
     expect(results[0]?.matchType).toBe("keyword");
   });
+
+  it("respects limit on a semantic cache hit, not just on the first (cache-miss) call", async () => {
+    await facts.saveFact({ fact: "cache limit regression fact one", project: "p3" });
+    await facts.saveFact({ fact: "cache limit regression fact two", project: "p3" });
+    await facts.saveFact({ fact: "cache limit regression fact three", project: "p3" });
+
+    const query = "cache limit regression";
+    const first = await facts.recallFacts({ query, mode: "semantic", project: "p3", limit: 1 });
+    expect(first.length).toBeLessThanOrEqual(1);
+
+    // Same query embedding -> cache hit on the second call.
+    const second = await facts.recallFacts({ query, mode: "semantic", project: "p3", limit: 1 });
+    expect(second.length).toBeLessThanOrEqual(1);
+  });
+
+  it("scopes the semantic cache by project, not just by query embedding", async () => {
+    await facts.saveFact({ fact: "project-scoped cache fact", project: "cache-proj-a" });
+    await facts.saveFact({ fact: "project-scoped cache fact", project: "cache-proj-b" });
+
+    const query = "project-scoped cache fact";
+    await facts.recallFacts({ query, mode: "semantic", project: "cache-proj-a", limit: 5 });
+    const forB = await facts.recallFacts({ query, mode: "semantic", project: "cache-proj-b", limit: 5 });
+
+    expect(forB.every((r) => r.fact.project === "cache-proj-b")).toBe(true);
+  });
 });
 
 describe("decisions", () => {
@@ -77,6 +101,12 @@ describe("decisions", () => {
     await decisions.logDecision({ title: "Second", context: "c", decision: "d" });
     const list = await decisions.getDecisions();
     expect(list[0]?.title).toBe("Second");
+  });
+
+  it("treats limit: 0 as 'return nothing', not 'no limit'", async () => {
+    await decisions.logDecision({ title: "Limit-zero check", context: "c", decision: "d", project: "limit-zero" });
+    const list = await decisions.getDecisions({ project: "limit-zero", limit: 0 });
+    expect(list).toEqual([]);
   });
 });
 

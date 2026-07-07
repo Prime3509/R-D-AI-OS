@@ -1,7 +1,15 @@
 import { Router } from "express";
+import { z } from "zod";
 import { saveFact, recallFacts } from "../../domain/facts.js";
 
 export const factsRouter = Router();
+
+const recallQuerySchema = z.object({
+  query: z.string().min(1),
+  mode: z.enum(["semantic", "keyword", "hybrid"]).optional(),
+  limit: z.coerce.number().int().positive().optional(),
+  project: z.string().optional(),
+});
 
 factsRouter.post("/facts", async (req, res) => {
   const fact = await saveFact(req.body);
@@ -9,12 +17,7 @@ factsRouter.post("/facts", async (req, res) => {
 });
 
 factsRouter.get("/facts/recall", async (req, res) => {
-  const { query, mode, limit, project } = req.query;
-  const results = await recallFacts({
-    query: String(query ?? ""),
-    mode: mode as "semantic" | "keyword" | "hybrid" | undefined,
-    limit: limit ? Number(limit) : undefined,
-    project: project ? String(project) : undefined,
-  });
-  res.json(results);
+  const parsed = recallQuerySchema.safeParse(req.query);
+  if (!parsed.success) return void res.status(400).json({ error: parsed.error.message });
+  res.json(await recallFacts(parsed.data));
 });

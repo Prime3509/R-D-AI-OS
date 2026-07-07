@@ -9,9 +9,7 @@ function wordSet(text: string): Set<string> {
   return new Set(text.toLowerCase().split(/\W+/).filter(Boolean));
 }
 
-function jaccardSimilarity(a: string, b: string): number {
-  const setA = wordSet(a);
-  const setB = wordSet(b);
+function jaccardSimilarity(setA: Set<string>, setB: Set<string>): number {
   if (setA.size === 0 || setB.size === 0) return 0;
   let intersection = 0;
   for (const word of setA) if (setB.has(word)) intersection++;
@@ -40,13 +38,14 @@ export async function getTeachingFeedback(input: GetTeachingFeedbackInput = {}):
     });
   }
 
+  const titleWordSets = decisions.map((d) => wordSet(d.title));
   const churnPairs: string[] = [];
   for (let i = 0; i < decisions.length; i++) {
     for (let j = i + 1; j < decisions.length; j++) {
       const a = decisions[i];
       const b = decisions[j];
       if (!a || !b) continue;
-      if (jaccardSimilarity(a.title, b.title) > 0.6) {
+      if (jaccardSimilarity(titleWordSets[i]!, titleWordSets[j]!) > 0.6) {
         churnPairs.push(a.id, b.id);
       }
     }

@@ -39,11 +39,15 @@ async function getFactsTable(): Promise<Table> {
       if (names.includes(FACTS_TABLE)) {
         return db.openTable(FACTS_TABLE);
       }
-      const dims = getEmbedder().dimensions;
+      // Dimension comes from a real embed call (not a hardcoded constant) so the
+      // schema always matches whatever NEXUS_EMBEDDING_MODEL actually produces.
+      // Note: swapping models against an existing data dir still requires a
+      // fresh NEXUS_DATA_DIR — LanceDB's vector column has a fixed width.
+      const probeVector = await getEmbedder().embed("nexus-schema-init");
       const seedRow: FactRow = {
         id: "__seed__",
         text: "",
-        vector: new Array(dims).fill(0),
+        vector: new Array(probeVector.length).fill(0),
         project: "",
         tags: "[]",
         source: "",
@@ -52,7 +56,13 @@ async function getFactsTable(): Promise<Table> {
       const table = await db.createTable(FACTS_TABLE, [seedRow]);
       await table.delete("id = '__seed__'");
       return table;
-    })();
+    })().catch((err) => {
+      // Don't cache a permanently-rejected promise: a transient failure (e.g.
+      // two processes racing to create the table on first boot) would
+      // otherwise wedge the facts subsystem for the rest of the process.
+      factsTablePromise = null;
+      throw err;
+    });
   }
   return factsTablePromise;
 }
@@ -64,13 +74,20 @@ export async function upsertFact(row: FactRow): Promise<void> {
   writesSinceReindex += 1;
   if (writesSinceReindex >= REINDEX_WRITE_INTERVAL) {
     writesSinceReindex = 0;
-    await ensureVectorIndex(table, VECTOR_COLUMN);
+    // Fire-and-forget: an ANN index rebuild can take a while and shouldn't
+    // block the caller's write.
+    ensureVectorIndex(table, VECTOR_COLUMN).catch((err) =>
+      console.error("[nexus] write-triggered reindex failed:", err),
+    );
   }
 }
 
-export async function deleteFact(id: string): Promise<void> {
+export async function deleteFact(id: string): Promise<boolean> {
   const table = await getFactsTable();
-  await table.delete(`id = '${id.replace(/'/g, "''")}'`);
+  const escapedId = id.replace(/'/g, "''");
+  const existed = (await table.countRows(`id = '${escapedId}'`)) > 0;
+  await table.delete(`id = '${escapedId}'`);
+  return existed;
 }
 
 export interface VectorSearchHit {
@@ -84,14 +101,15 @@ export interface VectorSearchHit {
   _distance: number;
 }
 
-export async function searchFactsByVector(embedding: number[], limit: number): Promise<VectorSearchHit[]> {
+export async function searchFactsByVector(
+  embedding: number[],
+  limit: number,
+  project?: string,
+): Promise<VectorSearchHit[]> {
   const table = await getFactsTable();
-  const rows = (await table
-    .query()
-    .nearestTo(embedding)
-    .distanceType("cosine")
-    .limit(limit)
-    .toArray()) as VectorSearchHit[];
+  let query = table.query().nearestTo(embedding).distanceType("cosine");
+  if (project) query = query.where(`project = '${project.replace(/'/g, "''")}'`);
+  const rows = (await query.limit(limit).toArray()) as VectorSearchHit[];
   return rows;
 }
 
@@ -103,7 +121,12 @@ export async function reindexFactsNow(): Promise<void> {
 
 let scheduledReindexTimer: NodeJS.Timeout | null = null;
 
-/** Periodically re-evaluates the facts index in the background (e.g. after bulk imports that bypass `upsertFact`'s write counter). */
+/**
+ * Periodically re-evaluates the facts index in the background. `writesSinceReindex`
+ * is an in-memory, per-process counter, so it resets on restart and is tracked
+ * independently by every process in a horizontally-scaled deployment — this
+ * scheduled sweep is the backstop that keeps the index current in either case.
+ */
 export function scheduleFactsReindexing(intervalMs = 30 * 60_000): void {
   if (scheduledReindexTimer) return;
   scheduledReindexTimer = setInterval(() => {

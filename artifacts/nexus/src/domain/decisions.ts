@@ -68,5 +68,5 @@ export async function getDecisions(input: GetDecisionsInput = {}): Promise<Decis
     .map(toDecision)
     .filter((d) => (input.project ? d.project === input.project : true))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  return input.limit ? decisions.slice(0, input.limit) : decisions;
+  return input.limit !== undefined ? decisions.slice(0, input.limit) : decisions;
 }

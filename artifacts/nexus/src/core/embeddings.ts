@@ -1,12 +1,10 @@
 import { cacheDir } from "./paths.js";
 
 export interface Embedder {
-  readonly dimensions: number;
   embed(text: string): Promise<number[]>;
 }
 
 const DEFAULT_MODEL = process.env.NEXUS_EMBEDDING_MODEL ?? "Xenova/all-MiniLM-L6-v2";
-const DEFAULT_DIMENSIONS = 384;
 
 type FeatureExtractionPipeline = (
   text: string,
@@ -19,7 +17,6 @@ type FeatureExtractionPipeline = (
  * `cacheDir`; subsequent calls run fully offline.
  */
 class TransformersEmbedder implements Embedder {
-  readonly dimensions = DEFAULT_DIMENSIONS;
   private pipelinePromise: Promise<FeatureExtractionPipeline> | null = null;
 
   private async getPipeline(): Promise<FeatureExtractionPipeline> {

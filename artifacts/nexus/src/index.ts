@@ -23,7 +23,12 @@ async function main(): Promise<void> {
   // MCP stdio and the HTTP listener are independent transports and can run
   // in the same process; only stdout is reserved (for MCP JSON-RPC framing),
   // so all logging below goes to stderr via console.error.
-  await prewarm();
+  //
+  // Pre-warming the embedding model takes several seconds and has no bearing
+  // on transport startup (e.g. /health), so it runs in the background instead
+  // of delaying readiness; the embedder's lazy singleton already coalesces
+  // concurrent callers onto the same in-flight load.
+  prewarm().catch((err) => console.error("[nexus] pre-warm failed:", err));
   scheduleFactsReindexing();
 
   if (mode === "mcp" || mode === "both") {
